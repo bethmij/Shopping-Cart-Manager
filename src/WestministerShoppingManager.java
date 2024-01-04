@@ -125,6 +125,19 @@ public class WestministerShoppingManager implements ShoppingManager{
         Scanner scanner = new Scanner(System.in);
         System.out.println("Insert the product ID");
         String productID = scanner.nextLine();
+
+        Iterator<Map<String, String>> iterator = productList.iterator();
+        while (iterator.hasNext()) {
+            Map<String, String> map = iterator.next();
+            if (map.get("Product ID") == productID) {
+                iterator.remove();
+                try (FileWriter writer = new FileWriter(filePath)) {
+                    writer.write(String.valueOf(productList));
+                } catch (IOException e) {
+                    System.err.println("Error writing to the file: " + e.getMessage());
+                }
+            }
+        }
     }
 
     public static List<Map<String, String>> getProductList() {
