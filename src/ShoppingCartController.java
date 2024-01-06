@@ -13,7 +13,7 @@ public class ShoppingCartController extends JFrame {
 
 
     public  ShoppingCartController(){
-
+dfdsf
         List<Map<String, String>> productList = WestministerShoppingManager.getProductList();
         setGUI(productList);
     }
