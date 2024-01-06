@@ -85,7 +85,7 @@ public class ShoppingCartController extends JFrame {
 
         JPanel panel3 = new JPanel();
         panel3.setLayout(new BoxLayout(panel3, BoxLayout.Y_AXIS));
-        Border paddingBorder2 = new EmptyBorder(60, 100, 100, 40);
+        Border paddingBorder2 = new EmptyBorder(10, 40, 30, 10);
         panel3.setBorder(paddingBorder2);
 
 
@@ -127,11 +127,23 @@ public class ShoppingCartController extends JFrame {
         lbl9.setFont(new Font("Arial",Font.PLAIN,18));
         panel3.add(lbl9);
 
+        JPanel panel4 = new JPanel();
+        JButton btn2 = new JButton("Add to Shopping Cart");
+        btn2.setFont(new Font("",0,16));
+        btn2.setHorizontalAlignment(JButton.CENTER);
+        panel4.add(btn2);
+
+        JPanel panel5 = new JPanel();
+        panel5.setLayout(new BoxLayout(panel5, BoxLayout.Y_AXIS));
+        Border paddingBorder3 = new EmptyBorder(10, 10, 30, 10);
+        panel5.setBorder(paddingBorder3);
+        panel5.add(panel3);
+        panel5.add(panel4);
 
 
         add(panel1,BorderLayout.PAGE_START);
         add(panel2,BorderLayout.CENTER);
-        add(panel3,BorderLayout.PAGE_END);
+        add(panel5,BorderLayout.PAGE_END);
     }
 
     private String[][] setDataToArray(List<Map<String, String>> productList) {
