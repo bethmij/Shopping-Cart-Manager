@@ -10,11 +10,7 @@ import java.util.*;
 import java.util.List;
 
 public class ShoppingCartController extends JFrame {
-    private JPanel panel1, panel2, panel3;
-    private JLabel lbl1;
-    private JComboBox<String> comboBox;
-    private JButton btn1;
-    private JTable table;
+
 
     public  ShoppingCartController(){
 
@@ -23,7 +19,7 @@ public class ShoppingCartController extends JFrame {
     }
 
     public void setGUI(List<Map<String, String>> productList){
-        setSize(900, 700);
+        setSize(900, 800);
         setTitle("Westminister Shopping Center");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
@@ -31,12 +27,12 @@ public class ShoppingCartController extends JFrame {
 //        getContentPane().setBackground(Color.BLUE);
 
 
-        panel1 = new JPanel();
+        JPanel panel1 = new JPanel();
         panel1.setLayout(new BoxLayout(panel1, BoxLayout.X_AXIS));
 //        panel1.setBackground(Color.BLUE);
         panel1.add(Box.createVerticalStrut(100));
 
-        lbl1=new JLabel("Select Product Category");
+        JLabel lbl1 = new JLabel("Select Product Category");
         lbl1.setFont(new Font("Arial",Font.PLAIN,20));
         lbl1.setHorizontalAlignment(JLabel.LEFT);
         lbl1.setLocation(200, 500);
@@ -45,13 +41,13 @@ public class ShoppingCartController extends JFrame {
 
 
         String[] options = {"All", "Electronics", "Clothing"};
-        comboBox = new JComboBox<>(options);
+        JComboBox<String> comboBox = new JComboBox<>(options);
         comboBox.setFont(new Font("Arial",Font.PLAIN,16));
         comboBox.setMaximumSize(new Dimension(comboBox.getMaximumSize().width, comboBox.getPreferredSize().height));
         panel1.add(comboBox);
         panel1.add(Box.createHorizontalStrut(250));
 
-        btn1=new JButton("Shopping Cart");
+        JButton btn1 = new JButton("Shopping Cart");
         btn1.setFont(new Font("",0,16));
         btn1.setHorizontalAlignment(JButton.CENTER);
         panel1.add(btn1);
@@ -59,8 +55,8 @@ public class ShoppingCartController extends JFrame {
 
 
         int rows = (int) Math.ceil((double) productList.size() / 5);
-        panel2 = new JPanel(new GridLayout(rows, 5, 10, 10));
-//        panel1.setBackground(Color.BLUE);
+        JPanel panel2 = new JPanel(new GridLayout(Math.min(rows, 2), 5, 10, 10));
+//        panel2.setBackground(Color.BLUE);
         panel1.add(Box.createVerticalStrut(100));
 
         String[] columnNames = {"Product ID", "Name", "Category", "Price ($)", "Info"};
@@ -70,6 +66,7 @@ public class ShoppingCartController extends JFrame {
         JTable table = new JTable(tableModel);
         table.setFont(new Font("Arial", Font.PLAIN, 16));
         table.setRowHeight(35);
+//        table.setBackground(Color.RED);
 
         DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
         centerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
@@ -80,14 +77,55 @@ public class ShoppingCartController extends JFrame {
 
         JScrollPane scrollPane = new JScrollPane(table);
 
+
         panel2.add(scrollPane, BorderLayout.CENTER);
-        int paddingSize = 10;
-        Border paddingBorder = new EmptyBorder(10, 40, 10, 40);
+        Border paddingBorder = new EmptyBorder(10, 40, 0, 40);
         panel2.setBorder(paddingBorder);
 
-        panel3 = new JPanel();
-        panel3.setLayout(new BoxLayout(panel3, BoxLayout.X_AXIS));
 
+        JPanel panel3 = new JPanel();
+        panel3.setLayout(new BoxLayout(panel3, BoxLayout.Y_AXIS));
+        Border paddingBorder2 = new EmptyBorder(60, 100, 100, 40);
+        panel3.setBorder(paddingBorder2);
+
+
+        JLabel lbl2 = new JLabel("Selected Product - Details");
+        lbl2.setFont(new Font("Arial",Font.PLAIN,20));
+        lbl2.setHorizontalAlignment(JLabel.CENTER);
+        panel3.add(lbl2, BorderLayout.CENTER);
+
+
+        JLabel lbl3 = new JLabel(" ");
+        lbl3.setFont(new Font("Arial",Font.PLAIN,20));
+        panel3.add(lbl3);
+
+        JLabel lbl4 = new JLabel("Product ID :");
+        lbl4.setFont(new Font("Arial",Font.PLAIN,18));
+        lbl4.setHorizontalAlignment(JLabel.CENTER);
+        lbl4.setOpaque(true);
+        lbl4.setPreferredSize(new Dimension(10, lbl4.getPreferredSize().height));
+        panel3.add(lbl4);
+
+        JLabel lbl5 = new JLabel("Category :");
+        lbl5.setFont(new Font("Arial",Font.PLAIN,18));
+        lbl4.setHorizontalAlignment(JLabel.CENTER);
+        panel3.add(lbl5);
+
+        JLabel lbl6 = new JLabel("Name : ");
+        lbl6.setFont(new Font("Arial",Font.PLAIN,18));
+        panel3.add(lbl6);
+
+        JLabel lbl7 = new JLabel("Size : ");
+        lbl7.setFont(new Font("Arial",Font.PLAIN,18));
+        panel3.add(lbl7);
+
+        JLabel lbl8 = new JLabel("Colour : ");
+        lbl8.setFont(new Font("Arial",Font.PLAIN,18));
+        panel3.add(lbl8);
+
+        JLabel lbl9 = new JLabel("Items Available : ");
+        lbl9.setFont(new Font("Arial",Font.PLAIN,18));
+        panel3.add(lbl9);
 
 
 
