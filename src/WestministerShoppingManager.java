@@ -98,17 +98,18 @@ public class WestministerShoppingManager implements ShoppingManager{
 
                         if (choice.length() == 1 && choice.charAt(0) == 'Y' || choice.charAt(0) == 'N') {
                             if (choice.charAt(0) == 'Y') {
-                                products = new LinkedHashMap<>();
-                                products.put("Product ID", productID);
-                                products.put("Product Type", "Electronics");
-                                products.put("Product Name", productName);
-                                products.put("Product Available Count", String.valueOf(productAblNo));
-                                products.put("Product Price", String.valueOf(productPrice));
-                                products.put("Product Brand", productBrand);
-                                products.put("Warranty Period", warrantyPeriod);
-                                productList.add(products);
-                                break;
-
+                                if(productList.size()<50) {
+                                    products = new LinkedHashMap<>();
+                                    products.put("Product ID", productID);
+                                    products.put("Product Type", "Electronics");
+                                    products.put("Product Name", productName);
+                                    products.put("Product Available Count", String.valueOf(productAblNo));
+                                    products.put("Product Price", String.valueOf(productPrice));
+                                    products.put("Product Brand", productBrand);
+                                    products.put("Warranty Period", warrantyPeriod);
+                                    productList.add(products);
+                                    break;
+                                }
                             } else if (choice.charAt(0) == 'N') {
                                 break;
                             } else {
@@ -128,16 +129,18 @@ public class WestministerShoppingManager implements ShoppingManager{
                         choice = scanner.next().toUpperCase();
                         if (choice.length() == 1 && choice.charAt(0) == 'Y' || choice.charAt(0) == 'N') {
                             if (choice.charAt(0) == 'Y') {
-                                products = new LinkedHashMap<>();
-                                products.put("Product ID", productID);
-                                products.put("Product Type", "Clothing");
-                                products.put("Product Name", productName);
-                                products.put("Product Available Count", String.valueOf(productAblNo));
-                                products.put("Product Price", String.valueOf(productPrice));
-                                products.put("Product Size", productSize);
-                                products.put("Product Color", productColor);
-                                productList.add(products);
-                                break;
+                                if(productList.size()<50) {
+                                    products = new LinkedHashMap<>();
+                                    products.put("Product ID", productID);
+                                    products.put("Product Type", "Clothing");
+                                    products.put("Product Name", productName);
+                                    products.put("Product Available Count", String.valueOf(productAblNo));
+                                    products.put("Product Price", String.valueOf(productPrice));
+                                    products.put("Product Size", productSize);
+                                    products.put("Product Color", productColor);
+                                    productList.add(products);
+                                    break;
+                                }
                             } else if (choice.charAt(0) == 'N') {
                                 break;
                             } else {
@@ -178,7 +181,7 @@ public class WestministerShoppingManager implements ShoppingManager{
                     iterator.remove();
                     try (FileWriter writer = new FileWriter(filePath)) {
                         writer.write(String.valueOf(productList));
-                        System.out.println("Product Deleted Successfully!");
+                        System.out.println(map.get("Product Name")+" Deleted Successfully!\n Products left = "+productList.size());
                     } catch (IOException e) {
                         System.err.println("Error writing to the file: " + e.getMessage());
                     }
