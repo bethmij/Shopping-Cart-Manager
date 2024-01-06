@@ -4,6 +4,8 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.List;
 import java.util.*;
 
@@ -13,10 +15,11 @@ public class ShoppingCartController extends JFrame {
 
 
     public  ShoppingCartController(){
-dfdsf
         List<Map<String, String>> productList = WestministerShoppingManager.getProductList();
         setGUI(productList);
     }
+
+
 
     public void setGUI(List<Map<String, String>> productList){
         setSize(900, 800);
@@ -159,6 +162,13 @@ dfdsf
         btn2.setHorizontalAlignment(JButton.CENTER);
         panel4.add(btn2);
 
+        btn2.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                setShoppingCartGUI(lbl4.getText(), productList);
+            }
+        });
+
         JPanel panel5 = new JPanel();
         panel5.setLayout(new BoxLayout(panel5, BoxLayout.Y_AXIS));
         Border paddingBorder3 = new EmptyBorder(10, 10, 30, 10);
@@ -236,6 +246,54 @@ dfdsf
                 }
             }
         }
+    }
+
+    private void setShoppingCartGUI(String productID, List<Map<String,String>> productList) {
+        setSize(700, 600);
+        setTitle("Shopping Cart");
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLocationRelativeTo(null);
+
+        JPanel panel2 = new JPanel(new GridLayout(1, 5, 10, 10));
+
+        String[] columnNames = {"Product", "Quantity", "Price"};
+        String[][] data = new String[0][];
+
+        DefaultTableModel tableModel2 = new DefaultTableModel(data, columnNames);
+        JTable table = new JTable(tableModel2);
+        table.setFont(new Font("Arial", Font.PLAIN, 16));
+        table.setRowHeight(35);
+
+        DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
+        centerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
+        centerRenderer.setVerticalAlignment(SwingConstants.CENTER);
+        for (int i = 0; i < table.getColumnCount(); i++) {
+            table.getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
+        }
+
+        JScrollPane scrollPane = new JScrollPane(table);
+        panel2.add(scrollPane);
+
+
+    }
+
+    public void updateShoppingCart(List<Map<String,String>> productList, String productID, DefaultTableModel table){
+        String[] newDateList = new String[0];
+        String product = null;
+        for (Map<String, String> map : productList) {
+            if (map.get("Product ID").equals(productID)) {
+                if (map.get("Product Type").equals("Electronics")) {
+                    product = map.get("Product ID") + "\n" + map.get("Product Name") + "\n" + map.get("Product Brand") +
+                            ", " + map.get("Warranty Period");
+                } else if (map.get("Product Type").equals("Clothing")) {
+                    product = map.get("Product ID") + "\n" + map.get("Product Name") + "\n" + map.get("Product Size") +
+                            ", " + map.get("Product Color");
+                }
+            }
+            newDateList = new String[]{product, String.valueOf(1), map.get("Product Price")};
+        }
+
+        table.addRow(newDateList);
     }
 
 
