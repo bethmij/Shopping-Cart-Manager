@@ -1,15 +1,18 @@
 import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.*;
 import java.util.List;
 
 public class ShoppingCartController extends JFrame {
+    private DefaultTableModel tableModel;
 
 
     public  ShoppingCartController(){
@@ -47,6 +50,26 @@ public class ShoppingCartController extends JFrame {
         panel1.add(comboBox);
         panel1.add(Box.createHorizontalStrut(250));
 
+        comboBox.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String selectedOption = (String) comboBox.getSelectedItem();
+                switch (selectedOption){
+                    case "All":
+                        updateTable (tableModel, productList);
+                        break;
+                    case "Electronics":
+                        List<Map<String, String>> electronicList = sortByCategory(productList, "Electronics");
+                        updateTable (tableModel, electronicList);
+                        break;
+                    case "Clothing":
+                        List<Map<String, String>> clothingList = sortByCategory(productList, "Clothing");
+                        updateTable (tableModel, clothingList);
+
+                }
+            }
+        });
+
         JButton btn1 = new JButton("Shopping Cart");
         btn1.setFont(new Font("",0,16));
         btn1.setHorizontalAlignment(JButton.CENTER);
@@ -60,13 +83,12 @@ public class ShoppingCartController extends JFrame {
         panel1.add(Box.createVerticalStrut(100));
 
         String[] columnNames = {"Product ID", "Name", "Category", "Price ($)", "Info"};
-        String[][] data = setDataToArray(productList);
+        String[][] data = getCustomizedDataArray(productList);
 
-        DefaultTableModel tableModel = new DefaultTableModel(data, columnNames);
+        tableModel = new DefaultTableModel(data, columnNames);
         JTable table = new JTable(tableModel);
         table.setFont(new Font("Arial", Font.PLAIN, 16));
         table.setRowHeight(35);
-//        table.setBackground(Color.RED);
 
         DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
         centerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
@@ -76,6 +98,23 @@ public class ShoppingCartController extends JFrame {
         }
 
         JScrollPane scrollPane = new JScrollPane(table);
+
+        table.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+            @Override
+            public void valueChanged(ListSelectionEvent e) {
+                if (!e.getValueIsAdjusting()) {
+                    int selectedRow = table.getSelectedRow();
+                    if (selectedRow != -1) {
+                        System.out.println("Selected Row: " + selectedRow);
+//                        // You can access the data in the selected row using getValueAt
+//                        Object firstName = table.getValueAt(selectedRow, 0);
+//                        Object lastName = table.getValueAt(selectedRow, 1);
+//                        Object age = table.getValueAt(selectedRow, 2);
+//                        System.out.println("Selected Data: " + firstName + " " + lastName + ", Age: " + age);
+                    }
+                }
+            }
+        });
 
 
         panel2.add(scrollPane, BorderLayout.CENTER);
@@ -146,7 +185,7 @@ public class ShoppingCartController extends JFrame {
         add(panel5,BorderLayout.PAGE_END);
     }
 
-    private String[][] setDataToArray(List<Map<String, String>> productList) {
+    private String[][] getCustomizedDataArray(List<Map<String, String>> productList) {
         Collections.sort(productList, Comparator.comparing(m -> m.get("Product ID")));
         Iterator<Map<String, String>> iterator = productList.iterator();
         String[][] data = new String[productList.size()][5];
@@ -171,7 +210,26 @@ public class ShoppingCartController extends JFrame {
         return data;
     }
 
+    public List<Map<String, String>> sortByCategory(List<Map<String,String>> productList, String productType){
+        Iterator<Map<String, String>> iterator = productList.iterator();
+        List<Map<String, String>> newList = new ArrayList<>();
+        while (iterator.hasNext()) {
+            Map<String, String> map = iterator.next();
+            if (map.get("Product Type").equals(productType)) {
+                newList.add(map);
+            }
+        }
+        newList.sort(Comparator.comparing(m -> m.get("Product ID")));
+        return newList;
+    }
 
+    public void updateTable (DefaultTableModel table, List<Map<String, String>> productList){
+        String[][] customizedArray = getCustomizedDataArray(productList);
+        table.setRowCount(0);
+        for (String[] productDataList : customizedArray) {
+            table.addRow(productDataList);
+        }
+    }
 
 
 }
