@@ -11,7 +11,6 @@ import java.util.Map;
 
 public class ShoppingCartGUIController extends JFrame {
     User user = new User();
-    OrderDetails orderDetails = getOrderDetails();
     ShoppingCart shoppingCart = new ShoppingCart();
     static String filePath = "order.txt";
 

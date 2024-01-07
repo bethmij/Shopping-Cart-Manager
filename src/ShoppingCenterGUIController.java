@@ -96,6 +96,7 @@ public class ShoppingCenterGUIController extends JFrame {
         table.getSelectionModel().addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting()) {
                 tableRowNumber = table.getSelectedRow();
+                lbl9.setForeground(Color.BLACK);
                 if (tableRowNumber != -1) {
                     String productID = (String) table.getValueAt(tableRowNumber, 0);
                     setSelectedProductDetails(productID, productList);
@@ -154,7 +155,7 @@ public class ShoppingCenterGUIController extends JFrame {
         btn2.setHorizontalAlignment(JButton.CENTER);
         panel4.add(btn2);
 
-        btn2.addActionListener(e -> shoppingCart.addItems(lbl4.getText(), productList,lbl5,table, tableModel,lbl9));
+        btn2.addActionListener(e -> shoppingCart.addItems(lbl4.getText(), productList,lbl5,table, lbl9));
 
         JPanel panel5 = new JPanel();
         panel5.setLayout(new BoxLayout(panel5, BoxLayout.Y_AXIS));

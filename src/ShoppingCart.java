@@ -1,10 +1,8 @@
 import javax.swing.*;
-import java.awt.*;
-import java.util.*;
-import java.util.List;
 import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableCellRenderer;
+import java.awt.*;
+import java.util.List;
+import java.util.*;
 
 public class ShoppingCart extends DefaultTableCellRenderer {
 
@@ -27,7 +25,7 @@ public class ShoppingCart extends DefaultTableCellRenderer {
         this.productList = productList;
     }
 
-    public void addItems(String productID, List<Product> productList, JLabel lbl5, JTable table, DefaultTableModel tableModel, JLabel lbl9) {
+    public void addItems(String productID, List<Product> productList, JLabel lbl5, JTable table, JLabel lbl9) {
 
         String[] id = (productID.split("Product ID : "));
         String[] category = (lbl5.getText().split("Category : "));
@@ -35,34 +33,41 @@ public class ShoppingCart extends DefaultTableCellRenderer {
 
 
         for (Product product : productList) {
-            if (product.getProductID().equals(id[1])) {
-                if (product.getProductAblNo() < 3) {
-                    CustomRenderer centerRenderer = new CustomRenderer(ShoppingCenterGUIController.tableRowNumber);
-                    centerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
-                    centerRenderer.setVerticalAlignment(SwingConstants.CENTER);
+            if (product.getProductAblNo() <= 0) {
+                lbl9.setText("Items Available : No Available Items!");
+                lbl9.setForeground(Color.RED);
+            } else {
+                if (product.getProductID().equals(id[1])) {
+                    if (product.getProductAblNo() < 3) {
+                        lbl9.setForeground(Color.RED);
+                        CustomRenderer centerRenderer = new CustomRenderer(ShoppingCenterGUIController.tableRowNumber);
+                        centerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
+                        centerRenderer.setVerticalAlignment(SwingConstants.CENTER);
 
-                    for (int i = 0; i < table.getColumnCount(); i++) {
-                        table.getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
+                        for (int i = 0; i < table.getColumnCount(); i++) {
+                            table.getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
+                        }
                     }
-                }
-                product.setProductAblNo(product.getProductAblNo() - 1);
-                WestministerShoppingManager.saveFile(productList, product.getName() + " availability : " + product.getProductAblNo());
-                lbl9.setText("Items Available : " + product.getProductAblNo());
+                    lbl9.setForeground(Color.BLACK);
+                    product.setProductAblNo(product.getProductAblNo() - 1);
+                    WestministerShoppingManager.saveFile(productList, product.getName() + " availability : " + product.getProductAblNo());
+                    lbl9.setText("Items Available : " + product.getProductAblNo());
 
-                list.put("Product ID", id[1]);
-                list.put("Product Quantity", String.valueOf(1));
-                list.put("Product Price", String.valueOf(product.getPrice()));
-                list.put("Product Type", category[1]);
-                Iterator<Map<String, String>> iterator = ShoppingCenterGUIController.shoppingCartList.iterator();
-                while (iterator.hasNext()) {
-                    Map<String, String> dataList = iterator.next();
-                    if (product.getProductID().equals(dataList.get("Product ID"))) {
-                        iterator.remove();
-                        list.put("Product Quantity", String.valueOf(Integer.parseInt(dataList.get("Product Quantity")) + 1));
-                        double currentPrice = Double.parseDouble(dataList.get("Product Price"));
-                        double additionalPrice = product.getPrice();
-                        double newPrice = currentPrice + additionalPrice;
-                        list.put("Product Price", String.valueOf(newPrice));
+                    list.put("Product ID", id[1]);
+                    list.put("Product Quantity", String.valueOf(1));
+                    list.put("Product Price", String.valueOf(product.getPrice()));
+                    list.put("Product Type", category[1]);
+                    Iterator<Map<String, String>> iterator = ShoppingCenterGUIController.shoppingCartList.iterator();
+                    while (iterator.hasNext()) {
+                        Map<String, String> dataList = iterator.next();
+                        if (product.getProductID().equals(dataList.get("Product ID"))) {
+                            iterator.remove();
+                            list.put("Product Quantity", String.valueOf(Integer.parseInt(dataList.get("Product Quantity")) + 1));
+                            double currentPrice = Double.parseDouble(dataList.get("Product Price"));
+                            double additionalPrice = product.getPrice();
+                            double newPrice = currentPrice + additionalPrice;
+                            list.put("Product Price", String.valueOf(newPrice));
+                        }
                     }
                 }
             }
@@ -136,12 +141,10 @@ public class ShoppingCart extends DefaultTableCellRenderer {
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
             Component rendererComponent = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
 
-            // Check if the current row is the target row
             if (row == targetRow) {
                 rendererComponent.setBackground(Color.RED);
                 rendererComponent.setForeground(Color.WHITE);
             } else {
-                // Reset background and foreground colors for other rows
                 rendererComponent.setBackground(table.getBackground());
                 rendererComponent.setForeground(table.getForeground());
             }
