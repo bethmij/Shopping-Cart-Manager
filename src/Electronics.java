@@ -1,12 +1,18 @@
 public class Electronics extends Product{
 
     private String brand;
-    private int warrantyPeriod;
+    private String warrantyPeriod;
 
     public Electronics() {
     }
 
-    public Electronics(String brand, int warrantyPeriod) {
+    public Electronics(String brand, String warrantyPeriod) {
+        this.brand = brand;
+        this.warrantyPeriod = warrantyPeriod;
+    }
+
+    public Electronics(String productID, String name, int productAblNo, double price, String productType, String brand, String warrantyPeriod) {
+        super(productID, name, productAblNo, price, productType);
         this.brand = brand;
         this.warrantyPeriod = warrantyPeriod;
     }
@@ -19,11 +25,19 @@ public class Electronics extends Product{
         this.brand = brand;
     }
 
-    public int getWarrantyPeriod() {
+    public String getWarrantyPeriod() {
         return warrantyPeriod;
     }
 
-    public void setWarrantyPeriod(int warrantyPeriod) {
+    public void setWarrantyPeriod(String warrantyPeriod) {
         this.warrantyPeriod = warrantyPeriod;
+    }
+
+    @Override
+    public String toString() {
+        return "Electronics{" +
+                "brand='" + brand + '\'' +
+                ", warrantyPeriod='" + warrantyPeriod + '\'' +
+                '}';
     }
 }

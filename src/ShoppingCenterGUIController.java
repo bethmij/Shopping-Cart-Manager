@@ -9,14 +9,16 @@ import java.awt.event.ActionListener;
 import java.util.List;
 import java.util.*;
 
-public class ShoppingCartController extends JFrame {
-    private DefaultTableModel tableModel;
+public class ShoppingCenterGUIController extends JFrame {
+    private DefaultTableModel tableModel, tableModel1;
     private JLabel lbl4,lbl5,lbl6,lbl7,lbl8,lbl9;
+    static List<Map<String,String>> shoppingCartList = new ArrayList<>();
+    User user = new User();
 
 
-    public  ShoppingCartController(){
-        List<Map<String, String>> productList = WestministerShoppingManager.getProductList();
-        setGUI(productList);
+    public ShoppingCenterGUIController(){
+//        List<Map<String, String>> productList = WestministerShoppingManager.getProductList();
+//        setGUI(productList);
     }
 
 
@@ -72,6 +74,13 @@ public class ShoppingCartController extends JFrame {
         btn1.setHorizontalAlignment(JButton.CENTER);
         panel1.add(btn1);
         panel1.add(Box.createHorizontalStrut(10));
+
+        btn1.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                new ShoppingCartGUIController().setVisible(true);
+            }
+        });
 
 
         int rows = (int) Math.ceil((double) productList.size() / 5);
@@ -165,7 +174,7 @@ public class ShoppingCartController extends JFrame {
         btn2.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                setShoppingCartGUI(lbl4.getText(), productList);
+                setShoppingCartList(lbl4.getText(), productList);
             }
         });
 
@@ -248,52 +257,38 @@ public class ShoppingCartController extends JFrame {
         }
     }
 
-    private void setShoppingCartGUI(String productID, List<Map<String,String>> productList) {
-        setSize(700, 600);
-        setTitle("Shopping Cart");
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLocationRelativeTo(null);
-
-        JPanel panel2 = new JPanel(new GridLayout(1, 5, 10, 10));
-
-        String[] columnNames = {"Product", "Quantity", "Price"};
-        String[][] data = new String[0][];
-
-        DefaultTableModel tableModel2 = new DefaultTableModel(data, columnNames);
-        JTable table = new JTable(tableModel2);
-        table.setFont(new Font("Arial", Font.PLAIN, 16));
-        table.setRowHeight(35);
-
-        DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
-        centerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
-        centerRenderer.setVerticalAlignment(SwingConstants.CENTER);
-        for (int i = 0; i < table.getColumnCount(); i++) {
-            table.getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
-        }
-
-        JScrollPane scrollPane = new JScrollPane(table);
-        panel2.add(scrollPane);
 
 
-    }
 
-    public void updateShoppingCart(List<Map<String,String>> productList, String productID, DefaultTableModel table){
-        String[] newDateList = new String[0];
-        String product = null;
+
+    public void setShoppingCartList(String productID, List<Map<String,String>> productList) {
+        String[] id = (productID.split("Product ID : "));
+        String[] category = (lbl5.getText().split("Category : "));
+        Map<String, String> list = new HashMap<>();
+
+
         for (Map<String, String> map : productList) {
-            if (map.get("Product ID").equals(productID)) {
-                if (map.get("Product Type").equals("Electronics")) {
-                    product = map.get("Product ID") + "\n" + map.get("Product Name") + "\n" + map.get("Product Brand") +
-                            ", " + map.get("Warranty Period");
-                } else if (map.get("Product Type").equals("Clothing")) {
-                    product = map.get("Product ID") + "\n" + map.get("Product Name") + "\n" + map.get("Product Size") +
-                            ", " + map.get("Product Color");
+            if (map.get("Product ID").equals(id[1])) {
+                list.put("Product ID", id[1]);
+                list.put("Product Quantity", String.valueOf(1));
+                list.put("Product Price", map.get("Product Price"));
+                list.put("Product Type", category[1]);
+                list.put("Product UserName", user.getUserName());
+                Iterator<Map<String, String>> iterator = shoppingCartList.iterator();
+                while (iterator.hasNext()) {
+                    Map<String, String> dataList = iterator.next();
+                    if (map.get("Product ID").equals(dataList.get("Product ID"))) {
+                        iterator.remove();
+                        list.put("Product Quantity", String.valueOf(Integer.parseInt(dataList.get("Product Quantity"))+1));
+                        double currentPrice = Double.parseDouble(dataList.get("Product Price"));
+                        double additionalPrice = Double.parseDouble(map.get("Product Price"));
+                        double newPrice = currentPrice + additionalPrice;
+                        list.put("Product Price", String.valueOf(newPrice));
+                    }
                 }
             }
-            newDateList = new String[]{product, String.valueOf(1), map.get("Product Price")};
         }
-
-        table.addRow(newDateList);
+        shoppingCartList.add(list);
     }
 
 

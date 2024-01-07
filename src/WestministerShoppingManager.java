@@ -1,5 +1,4 @@
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -15,7 +14,9 @@ public class WestministerShoppingManager implements ShoppingManager{
         System.err.println("|      WELCOME TO WESTMINISTER SHOPPING MANAGER    |");
         System.err.println("----------------------------------------------------");
 
-        List<Map<String, String>> productList = getProductList();
+//        List<Map<String, String>> productList = getProductList();
+        List<Product> productList = getProductList();
+//        System.out.println(productList.get(0).getProductID());
 
         while (true) {
             System.out.println("\n A) Add a new product\n B) Print the list of products\n C) Delete a product\n D) End program");
@@ -32,7 +33,7 @@ public class WestministerShoppingManager implements ShoppingManager{
                         break;
 
                     case 'C' :
-                        deleteProduct(productList, scanner);
+//                        deleteProduct(productList, scanner);
                         break;
 
                     case 'D' : System.exit(0);
@@ -43,7 +44,7 @@ public class WestministerShoppingManager implements ShoppingManager{
         }
     }
 
-    public static void addNewProduct(List<Map<String, String>> productList, Scanner scanner){
+    public static void addNewProduct(List<Product> productList, Scanner scanner){
         System.err.println("|  ADD A NEW PRODUCT  |");
         scanner.nextLine();
 
@@ -99,15 +100,9 @@ public class WestministerShoppingManager implements ShoppingManager{
                         if (choice.length() == 1 && choice.charAt(0) == 'Y' || choice.charAt(0) == 'N') {
                             if (choice.charAt(0) == 'Y') {
                                 if(productList.size()<50) {
-                                    products = new LinkedHashMap<>();
-                                    products.put("Product ID", productID);
-                                    products.put("Product Type", "Electronics");
-                                    products.put("Product Name", productName);
-                                    products.put("Product Available Count", String.valueOf(productAblNo));
-                                    products.put("Product Price", String.valueOf(productPrice));
-                                    products.put("Product Brand", productBrand);
-                                    products.put("Warranty Period", warrantyPeriod);
-                                    productList.add(products);
+                                    Electronics electronics =
+                                       new Electronics(productID, productName, productAblNo, productPrice, "Electronics", productBrand, warrantyPeriod);
+                                    productList.add(electronics);
                                     break;
                                 }
                             } else if (choice.charAt(0) == 'N') {
@@ -130,15 +125,9 @@ public class WestministerShoppingManager implements ShoppingManager{
                         if (choice.length() == 1 && choice.charAt(0) == 'Y' || choice.charAt(0) == 'N') {
                             if (choice.charAt(0) == 'Y') {
                                 if(productList.size()<50) {
-                                    products = new LinkedHashMap<>();
-                                    products.put("Product ID", productID);
-                                    products.put("Product Type", "Clothing");
-                                    products.put("Product Name", productName);
-                                    products.put("Product Available Count", String.valueOf(productAblNo));
-                                    products.put("Product Price", String.valueOf(productPrice));
-                                    products.put("Product Size", productSize);
-                                    products.put("Product Color", productColor);
-                                    productList.add(products);
+                                    Clothing clothing =
+                                            new Clothing(productID, productName, productAblNo, productPrice, "Clothing", productSize, productColor);
+                                    productList.add(clothing);
                                     break;
                                 }
                             } else if (choice.charAt(0) == 'N') {
@@ -151,16 +140,20 @@ public class WestministerShoppingManager implements ShoppingManager{
                 } else {
                     System.out.println("Invalid Input! Please Try Again");
                 }
-                try (FileWriter writer = new FileWriter(filePath)) {
-                    writer.write(String.valueOf(productList));
-                    System.out.println("Product saved successfully!");
-                } catch (IOException e) {
-                    System.err.println("Error writing to the file: " + e.getMessage());
-                }
+                saveFile(productList, "Product saved successfully!");
                 break;
             }else{
                 System.out.println(" Invalid Input! Please try again");
             }
+        }
+    }
+
+    private static void saveFile(List<Product> productList, String msg) {
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(filePath))) {
+            oos.writeObject(productList);
+            System.out.println(msg);
+        } catch (IOException e) {
+            System.out.println("Error writing to the file: " + e.getMessage());
         }
     }
 
@@ -179,12 +172,7 @@ public class WestministerShoppingManager implements ShoppingManager{
                 Map<String, String> map = iterator.next();
                 if (map.get("Product ID").equals(productID)) {
                     iterator.remove();
-                    try (FileWriter writer = new FileWriter(filePath)) {
-                        writer.write(String.valueOf(productList));
-                        System.out.println(map.get("Product Name")+" Deleted Successfully!\n Products left = "+productList.size());
-                    } catch (IOException e) {
-                        System.err.println("Error writing to the file: " + e.getMessage());
-                    }
+//                    saveFile(productList, map.get("Product Name") + " Deleted Successfully!\n Products left = " + productList.size());
                 } else {
                     count++;
                 }
@@ -198,18 +186,18 @@ public class WestministerShoppingManager implements ShoppingManager{
         }
     }
 
-    public static List<Map<String, String>> getProductList() {
-        Path path = Paths.get(filePath);
-        String fileContent = null;
-        try {
-            fileContent = Files.readString(path);
-        } catch (IOException e) {
-            e.printStackTrace();
+    public static List<Product> getProductList() {
+        List<Product> resultSet = new ArrayList<>();
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(filePath))) {
+            resultSet = (List) ois.readObject();
+        } catch (EOFException e) {
+        } catch (IOException | ClassNotFoundException e) {
+            System.out.println("Error: " + e.getMessage());
         }
-        return  convertStringToList(fileContent);
+        return resultSet;
     }
 
-    public static void displayProductList(List<Map<String, String>> productList, Scanner scanner) {
+    public static void displayProductList(List<Product> productList, Scanner scanner) {
         System.err.println("|  DISPLAY PRODUCT LIST  |");
         scanner.nextLine();
 
@@ -220,11 +208,12 @@ public class WestministerShoppingManager implements ShoppingManager{
             if (choice.length()==1 && choice.charAt(0)=='A' || choice.charAt(0)=='B' || choice.charAt(0)=='C') {
                 System.out.println();
                 if (choice.charAt(0)=='A'){
-                    Collections.sort(productList, Comparator.comparing(m -> m.get("Product ID")));
-                    for (Map<String, String> product : productList) {
-                        for (Map.Entry<String, String> entry : product.entrySet()) {
-                            System.out.println(" "+entry.getKey() + " : " + entry.getValue());
-                        }
+                    productList.sort(Comparator.comparing(Product::getProductID));
+                    for (Product product : productList) {
+                        System.out.println(product);
+//                        for (Map.Entry<String, String> entry : product.entrySet()) {
+//                            System.out.println(" "+entry.getKey() + " : " + entry.getValue());
+//                        }
                         System.out.println("\n");
                     }
                     break;
@@ -243,22 +232,34 @@ public class WestministerShoppingManager implements ShoppingManager{
         }
     }
 
-    private static void sortByProductType(List<Map<String, String>> productList, String ProductType) {
-        Iterator<Map<String, String>> iterator = productList.iterator();
-        List<Map<String, String>> newList = new ArrayList<>();
-        while (iterator.hasNext()) {
-            Map<String, String> map = iterator.next();
-            if (map.get("Product Type").equals(ProductType)) {
-                newList.add(map);
+    private static void sortByProductType(List<Product> productList, String ProductType) {
+//        Iterator<Map<String, String>> iterator = productList.iterator();
+//        List<Map<String, String>> newList = new ArrayList<>();
+//        while (iterator.hasNext()) {
+//            Map<String, String> map = iterator.next();
+//            if (map.get("Product Type").equals(ProductType)) {
+//                newList.add(map);
+//            }
+//        }
+//        newList.sort(Comparator.comparing(m -> m.get("Product ID")));
+//        for (Map<String, String> product : newList) {
+//            for (Map.Entry<String, String> entry : product.entrySet()) {
+//                System.out.println(" "+entry.getKey() + " : " + entry.getValue());
+//            }
+//            System.out.println();
+//        }
+        List<Product> newList = new ArrayList<>();
+        for (Product product : productList) {
+            if (product.getProductID().equals(ProductType)) {
+                newList.add(product);
             }
         }
-        newList.sort(Comparator.comparing(m -> m.get("Product ID")));
-        for (Map<String, String> product : newList) {
-            for (Map.Entry<String, String> entry : product.entrySet()) {
-                System.out.println(" "+entry.getKey() + " : " + entry.getValue());
-            }
+        newList.sort(Comparator.comparing(Product::getProductID));
+        for (Product product : newList) {
+            System.out.println(product);
             System.out.println();
         }
+
     }
 
 
