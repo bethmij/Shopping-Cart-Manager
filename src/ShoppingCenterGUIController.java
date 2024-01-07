@@ -12,6 +12,7 @@ public class ShoppingCenterGUIController extends JFrame {
     private JLabel lbl4,lbl5,lbl6,lbl7,lbl8,lbl9;
     static List<Map<String,String>> shoppingCartList = new ArrayList<>();
     ShoppingCart shoppingCart = new ShoppingCart();
+    static int tableRowNumber;
 
     public ShoppingCenterGUIController(){
         List<Product> productList = WestministerShoppingManager.getProductList();
@@ -94,9 +95,9 @@ public class ShoppingCenterGUIController extends JFrame {
 
         table.getSelectionModel().addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting()) {
-                int selectedRow = table.getSelectedRow();
-                if (selectedRow != -1) {
-                    String productID = (String) table.getValueAt(selectedRow, 0);
+                tableRowNumber = table.getSelectedRow();
+                if (tableRowNumber != -1) {
+                    String productID = (String) table.getValueAt(tableRowNumber, 0);
                     setSelectedProductDetails(productID, productList);
                 }
             }
@@ -153,7 +154,7 @@ public class ShoppingCenterGUIController extends JFrame {
         btn2.setHorizontalAlignment(JButton.CENTER);
         panel4.add(btn2);
 
-        btn2.addActionListener(e -> shoppingCart.addItems(lbl4.getText(), productList,lbl5));
+        btn2.addActionListener(e -> shoppingCart.addItems(lbl4.getText(), productList,lbl5,table, tableModel,lbl9));
 
         JPanel panel5 = new JPanel();
         panel5.setLayout(new BoxLayout(panel5, BoxLayout.Y_AXIS));
@@ -181,8 +182,6 @@ public class ShoppingCenterGUIController extends JFrame {
             data[i][3] = String.valueOf(product.getPrice());
 
             if (product.getProductType().equals("Electronics")) {
-                System.out.println(((Electronics)product).getBrand());
-                System.out.println(((Electronics) product).getWarrantyPeriod());
                 data[i][4] = ((Electronics)product).getBrand()+ ", " + ((Electronics)product).getWarrantyPeriod();
             } else {
                 data[i][4] = ((Clothing)product).getSize() + ", " + ((Clothing)product).getColor();

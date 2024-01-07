@@ -1,7 +1,12 @@
 import javax.swing.*;
+import java.awt.*;
 import java.util.*;
+import java.util.List;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellRenderer;
 
-public class ShoppingCart  {
+public class ShoppingCart extends DefaultTableCellRenderer {
 
     private List<Product> productList;
 
@@ -22,7 +27,8 @@ public class ShoppingCart  {
         this.productList = productList;
     }
 
-    public void addItems(String productID, List<Product> productList, JLabel lbl5){
+    public void addItems(String productID, List<Product> productList, JLabel lbl5, JTable table, DefaultTableModel tableModel, JLabel lbl9) {
+
         String[] id = (productID.split("Product ID : "));
         String[] category = (lbl5.getText().split("Category : "));
         Map<String, String> list = new HashMap<>();
@@ -30,6 +36,19 @@ public class ShoppingCart  {
 
         for (Product product : productList) {
             if (product.getProductID().equals(id[1])) {
+                if (product.getProductAblNo() < 3) {
+                    CustomRenderer centerRenderer = new CustomRenderer(ShoppingCenterGUIController.tableRowNumber);
+                    centerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
+                    centerRenderer.setVerticalAlignment(SwingConstants.CENTER);
+
+                    for (int i = 0; i < table.getColumnCount(); i++) {
+                        table.getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
+                    }
+                }
+                product.setProductAblNo(product.getProductAblNo() - 1);
+                WestministerShoppingManager.saveFile(productList, product.getName() + " availability : " + product.getProductAblNo());
+                lbl9.setText("Items Available : " + product.getProductAblNo());
+
                 list.put("Product ID", id[1]);
                 list.put("Product Quantity", String.valueOf(1));
                 list.put("Product Price", String.valueOf(product.getPrice()));
@@ -39,7 +58,7 @@ public class ShoppingCart  {
                     Map<String, String> dataList = iterator.next();
                     if (product.getProductID().equals(dataList.get("Product ID"))) {
                         iterator.remove();
-                        list.put("Product Quantity", String.valueOf(Integer.parseInt(dataList.get("Product Quantity"))+1));
+                        list.put("Product Quantity", String.valueOf(Integer.parseInt(dataList.get("Product Quantity")) + 1));
                         double currentPrice = Double.parseDouble(dataList.get("Product Price"));
                         double additionalPrice = product.getPrice();
                         double newPrice = currentPrice + additionalPrice;
@@ -50,7 +69,6 @@ public class ShoppingCart  {
         }
         ShoppingCenterGUIController.shoppingCartList.add(list);
     }
-
 
     public void removeItems(List<Product> productList, Scanner scanner){
 
@@ -107,6 +125,30 @@ public class ShoppingCart  {
 
     }
 
+    private static class CustomRenderer extends DefaultTableCellRenderer {
+        private final int targetRow;
+
+        public CustomRenderer(int targetRow) {
+            this.targetRow = targetRow;
+        }
+
+        @Override
+        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+            Component rendererComponent = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+
+            // Check if the current row is the target row
+            if (row == targetRow) {
+                rendererComponent.setBackground(Color.RED);
+                rendererComponent.setForeground(Color.WHITE);
+            } else {
+                // Reset background and foreground colors for other rows
+                rendererComponent.setBackground(table.getBackground());
+                rendererComponent.setForeground(table.getForeground());
+            }
+
+            return rendererComponent;
+        }
+    }
 
 
 

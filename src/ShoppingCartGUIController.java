@@ -18,9 +18,7 @@ public class ShoppingCartGUIController extends JFrame {
     ShoppingCartGUIController(){
         List<Map<String, String>> shoppingCartList = ShoppingCenterGUIController.shoppingCartList;
         List<Product> productList = WestministerShoppingManager.getProductList();
-        System.out.println(orderDetails);
-        System.out.println(user.getUserName());
-        System.out.println(orderDetails.getCustomerName());
+
         setShoppingCartGUI(shoppingCartList, productList);
 
     }

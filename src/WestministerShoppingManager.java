@@ -150,7 +150,6 @@ public class WestministerShoppingManager implements ShoppingManager {
 
                     System.out.print("Product warranty period : ");
                     String warrantyPeriod = scanner.nextLine();
-                    System.out.println(productBrand);
 
                     while (true) {
                         System.out.print("Do you want to save this product Y/N : ");
