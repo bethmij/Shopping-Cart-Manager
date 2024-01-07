@@ -1,14 +1,17 @@
+import java.io.Serializable;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-public class OrderDetails {
+public class OrderDetails implements Serializable {
     private String customerName;
-    private HashMap<String, Integer> productDetails;
+    private List<Map<String, String>> productDetails;
     private double price;
 
     public OrderDetails() {
     }
 
-    public OrderDetails(String customerName, HashMap<String, Integer> productDetails, double price) {
+    public OrderDetails(String customerName, List<Map<String, String>> productDetails, double price) {
         this.customerName = customerName;
         this.productDetails = productDetails;
         this.price = price;
@@ -22,11 +25,11 @@ public class OrderDetails {
         this.customerName = customerName;
     }
 
-    public HashMap<String, Integer> getProductDetails() {
+    public List<Map<String, String>> getProductDetails() {
         return productDetails;
     }
 
-    public void setProductDetails(HashMap<String, Integer> productDetails) {
+    public void setProductDetails(List<Map<String, String>> productDetails) {
         this.productDetails = productDetails;
     }
 
@@ -36,6 +39,15 @@ public class OrderDetails {
 
     public void setPrice(double price) {
         this.price = price;
+    }
+
+    @Override
+    public String toString() {
+        return "OrderDetails{" +
+                "customerName='" + customerName + '\'' +
+                ", productDetails=" + productDetails +
+                ", price=" + price +
+                '}';
     }
 }
 

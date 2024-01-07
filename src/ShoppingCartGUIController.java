@@ -5,24 +5,29 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 public class ShoppingCartGUIController extends JFrame {
     User user = new User();
+    OrderDetails orderDetails = getOrderDetails();
+    static String filePath = "order.txt";
 
     ShoppingCartGUIController(){
         List<Map<String, String>> shoppingCartList = ShoppingCenterGUIController.shoppingCartList;
-//        List<Map<String, String>> productList = WestministerShoppingManager.getProductList();
+        List<Product> productList = WestministerShoppingManager.getProductList();
+        System.out.println(orderDetails);
+        System.out.println(user.getUserName());
+        System.out.println(orderDetails.getCustomerName());
+        setShoppingCartGUI(shoppingCartList, productList);
 
-//        setShoppingCartGUI(shoppingCartList, productList);
-
-
-
-//        String productID, List<Map<String,String>> productList
     }
 
-    private void setShoppingCartGUI(List<Map<String, String>> shoppingCartList, List<Map<String, String>> productList) {
+    private void setShoppingCartGUI(List<Map<String, String>> shoppingCartList, List<Product> productList) {
         setSize(700, 700);
         setTitle("Shopping Cart");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -59,38 +64,59 @@ public class ShoppingCartGUIController extends JFrame {
         Border paddingBorder2 = new EmptyBorder(30, 10, 5, 100);
         panel2.setBorder(paddingBorder2);
 
-        int total = calculateTotal(shoppingCartList);
+        double total = calculateTotal(shoppingCartList);
         double discountThreeItem = calculateThreeItemDiscount(shoppingCartList, total);
         double discountFirstPurchase = calculateFirstDiscount(shoppingCartList, total);
+        double finalTotal = total-(discountThreeItem+discountFirstPurchase);
 
 
-        JLabel lbl1 = new JLabel("<html><div style='text-align: right;'>Total : " +
+        JLabel lbl1 = new JLabel("<html><div style='text-align: right;'>Total  :  " +
                                                 ""+total+"</div></html>");
         lbl1.setFont(new Font("Arial",Font.PLAIN,18));
         lbl1.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
         panel2.add(lbl1);
         panel2.add(Box.createVerticalStrut(10));
 
-        JLabel lbl2 = new JLabel("<html><div style='text-align: right;'>First Purchase Discount (10%)"+
+        JLabel lbl2 = new JLabel("<html><div style='text-align: right;'>First Purchase Discount (10%)  :  "+
                                                 ""+discountFirstPurchase+"  </div></html>");
         lbl2.setFont(new Font("Arial",Font.PLAIN,18));
         lbl2.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
         panel2.add(lbl2);
         panel2.add(Box.createVerticalStrut(10));
 
-        JLabel lbl3 = new JLabel("<html><div style='text-align: right;'>Three items in same Category Discount (20%) :"+
+        JLabel lbl3 = new JLabel("<html><div style='text-align: right;'>Three items in same Category Discount (20%) :  "+
                                         discountThreeItem+"  </div></html>");
         lbl3.setFont(new Font("Arial",Font.PLAIN,18));
         lbl3.setHorizontalAlignment(JLabel.RIGHT);
         panel2.add(lbl3);
         panel2.add(Box.createVerticalStrut(10));
 
-        JLabel lbl4 = new JLabel("<html><div style='text-align: right;'>Final Total  </div></html>");
+        JLabel lbl4 = new JLabel("<html><div style='text-align: right;'>Final Total  :  "+
+                                        finalTotal+"</div></html>");
         lbl4.setFont(new Font("Arial",Font.PLAIN,18));
         lbl4.setHorizontalAlignment(JLabel.RIGHT);
         panel2.add(lbl4);
 
         JPanel panel3 = new JPanel();
+        JButton btn2 = new JButton("Confirm Order");
+        btn2.setFont(new Font("", Font.PLAIN,16));
+        btn2.setHorizontalAlignment(JButton.CENTER);
+        panel3.add(btn2);
+        Border paddingBorder1 = new EmptyBorder(10, 10, 10, 10);
+        panel3.setBorder(paddingBorder1);
+        btn2.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                OrderDetails orderDetails = new OrderDetails(user.getUserName(), shoppingCartList, finalTotal);
+                try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(filePath))) {
+                    oos.writeObject(orderDetails);
+                    System.out.println("Order Saved Successfully!");
+                } catch (IOException en) {
+                    System.out.println("Error writing to the file: " + en.getMessage());
+                }
+            }
+        });
 
 
         add(panel1, BorderLayout.PAGE_START);
@@ -99,20 +125,20 @@ public class ShoppingCartGUIController extends JFrame {
 
     }
 
-    public static String[][] setShoppingCartList(List<Map<String, String>> shoppingCartList, List<Map<String, String>> productList){
+    public static String[][] setShoppingCartList(List<Map<String, String>> shoppingCartList, List<Product> productList){
         String[][] newDateList = new String[shoppingCartList.size()][];
         String product = null;
         int i = 0;
 
         for (Map<String, String> map : shoppingCartList) {
-            for (Map<String, String> list : productList) {
-                if(map.get("Product ID").equals(list.get("Product ID"))){
+            for (Product list : productList) {
+                if(map.get("Product ID").equals(list.getProductID())){
                     if (map.get("Product Type").equals("Electronics")) {
-                        product = list.get("Product ID") + "\n" + list.get("Product Name") + "\n" + list.get("Product Brand") +
-                                ", " + list.get("Warranty Period");
+                        product = list.getProductID() + "\n" + list.getName() + "\n" + ((Electronics)list).getBrand() +
+                                ", " + ((Electronics)list).getWarrantyPeriod();
                     }else if (map.get("Product Type").equals("Clothing")) {
-                        product = list.get("Product ID") + "\n" + list.get("Product Name") + "\n" + list.get("Product Size") +
-                                ", " + list.get("Product Color");
+                        product = list.getProductID() + "\n" + list.getName() + "\n" + ((Clothing)list).getSize() +
+                                ", " + ((Clothing)list).getColor();
                     }
                 }
             }
@@ -134,7 +160,7 @@ public class ShoppingCartGUIController extends JFrame {
         return total;
     }
 
-    public double calculateThreeItemDiscount(List<Map<String, String>> shoppingCartList, int total){
+    public double calculateThreeItemDiscount(List<Map<String, String>> shoppingCartList, double total){
         double discount = 0;
         int electronicCount = 0;
         int clothingCount = 0;
@@ -160,14 +186,24 @@ public class ShoppingCartGUIController extends JFrame {
         return discount;
     }
 
-    public double calculateFirstDiscount(List<Map<String, String>> shoppingCartList, int total){
+    public double calculateFirstDiscount(List<Map<String, String>> shoppingCartList, double total){
         double discount = 0;
 
-        for (Map<String, String> map : shoppingCartList) {
-            if(map.get("Product UserName").equals(user.getUserName())) {
-                discount = (10 / 100.0) * total;
-            }
+        if (orderDetails.getCustomerName()==null || !orderDetails.getCustomerName().equals(user.getUserName())) {
+            discount = (10 / 100.0) * total;
         }
         return discount;
     }
+
+    public static OrderDetails getOrderDetails() {
+        OrderDetails orderDetails = new OrderDetails();
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(filePath))) {
+            orderDetails = (OrderDetails) ois.readObject();
+        } catch (EOFException ignored) {
+        } catch (IOException | ClassNotFoundException e) {
+            System.out.println("Error: " + e.getMessage());
+        }
+        return orderDetails;
+    }
+
 }

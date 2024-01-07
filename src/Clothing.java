@@ -35,9 +35,12 @@ public class Clothing extends Product{
 
     @Override
     public String toString() {
-        return "Clothing{" +
-                "size='" + size + '\'' +
-                ", color='" + color + '\'' +
-                '}';
+        return  "Product ID : " + getProductID() +"\n"+
+                "Product Type : " + "Clothing" + '\n' +
+                "Product Name : " + getName() + '\n' +
+                "Product Available : " + getProductAblNo() + '\n' +
+                "Product Price : " + getPrice() + '\n' +
+                "Product Size : " + size + '\n' +
+                "Product Colour : " + color +"" ;
     }
 }

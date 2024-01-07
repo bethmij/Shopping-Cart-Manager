@@ -1,9 +1,5 @@
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.*;
-
 
 public class WestministerShoppingManager implements ShoppingManager{
     static String filePath = "data.txt";
@@ -14,9 +10,7 @@ public class WestministerShoppingManager implements ShoppingManager{
         System.err.println("|      WELCOME TO WESTMINISTER SHOPPING MANAGER    |");
         System.err.println("----------------------------------------------------");
 
-//        List<Map<String, String>> productList = getProductList();
         List<Product> productList = getProductList();
-//        System.out.println(productList.get(0).getProductID());
 
         while (true) {
             System.out.println("\n A) Add a new product\n B) Print the list of products\n C) Delete a product\n D) End program");
@@ -27,13 +21,11 @@ public class WestministerShoppingManager implements ShoppingManager{
                     case 'A' :
                         addNewProduct(productList, scanner);
                         break;
-
                     case 'B' :
                         displayProductList(productList, scanner);
                         break;
-
                     case 'C' :
-//                        deleteProduct(productList, scanner);
+                        deleteProduct(productList, scanner);
                         break;
 
                     case 'D' : System.exit(0);
@@ -84,7 +76,6 @@ public class WestministerShoppingManager implements ShoppingManager{
             String choice = scanner.next().toUpperCase();
             if (choice.length() == 1 && choice.charAt(0) == 'E' || choice.charAt(0) == 'C') {
                 char productType = choice.charAt(0);
-                Map<String, String> products;
 
                 if (productType == 'E') {
                     System.out.print("Product brand name : ");
@@ -158,7 +149,7 @@ public class WestministerShoppingManager implements ShoppingManager{
     }
 
 
-    public static void deleteProduct(List<Map<String, String>> productList, Scanner scanner){
+    public static void deleteProduct(List<Product> productList, Scanner scanner){
         System.err.println("|  DELETE A PRODUCT  |");
         scanner.nextLine();
         int count = 0, prevCount = productList.size();
@@ -167,17 +158,16 @@ public class WestministerShoppingManager implements ShoppingManager{
             System.out.print("\nInsert the product ID : ");
             String productID = scanner.nextLine();
 
-            Iterator<Map<String, String>> iterator = productList.iterator();
+            Iterator<Product> iterator = productList.iterator();
             while (iterator.hasNext()) {
-                Map<String, String> map = iterator.next();
-                if (map.get("Product ID").equals(productID)) {
+                Product product = iterator.next();
+                if (product.getProductID().equals(productID)) {
                     iterator.remove();
-//                    saveFile(productList, map.get("Product Name") + " Deleted Successfully!\n Products left = " + productList.size());
+                    saveFile(productList, product.getName() + " Deleted Successfully!\n Products left = " + productList.size());
                 } else {
                     count++;
                 }
             }
-
             if(count == prevCount){
                 System.out.println("Invalid product ID! Please try again");
             }else {
@@ -190,7 +180,7 @@ public class WestministerShoppingManager implements ShoppingManager{
         List<Product> resultSet = new ArrayList<>();
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(filePath))) {
             resultSet = (List) ois.readObject();
-        } catch (EOFException e) {
+        } catch (EOFException ignored) {
         } catch (IOException | ClassNotFoundException e) {
             System.out.println("Error: " + e.getMessage());
         }
@@ -211,9 +201,6 @@ public class WestministerShoppingManager implements ShoppingManager{
                     productList.sort(Comparator.comparing(Product::getProductID));
                     for (Product product : productList) {
                         System.out.println(product);
-//                        for (Map.Entry<String, String> entry : product.entrySet()) {
-//                            System.out.println(" "+entry.getKey() + " : " + entry.getValue());
-//                        }
                         System.out.println("\n");
                     }
                     break;
@@ -224,73 +211,31 @@ public class WestministerShoppingManager implements ShoppingManager{
                     sortByProductType(productList, "Clothing");
                     break;
                 }
-
-
-
             }
-
         }
     }
 
-    private static void sortByProductType(List<Product> productList, String ProductType) {
-//        Iterator<Map<String, String>> iterator = productList.iterator();
-//        List<Map<String, String>> newList = new ArrayList<>();
-//        while (iterator.hasNext()) {
-//            Map<String, String> map = iterator.next();
-//            if (map.get("Product Type").equals(ProductType)) {
-//                newList.add(map);
-//            }
-//        }
-//        newList.sort(Comparator.comparing(m -> m.get("Product ID")));
-//        for (Map<String, String> product : newList) {
-//            for (Map.Entry<String, String> entry : product.entrySet()) {
-//                System.out.println(" "+entry.getKey() + " : " + entry.getValue());
-//            }
-//            System.out.println();
-//        }
+    private static void sortByProductType(List<Product> productList, String productType) {
         List<Product> newList = new ArrayList<>();
         for (Product product : productList) {
-            if (product.getProductID().equals(ProductType)) {
+            if (product.getProductType().equals(productType)) {
                 newList.add(product);
             }
         }
-        newList.sort(Comparator.comparing(Product::getProductID));
-        for (Product product : newList) {
-            System.out.println(product);
-            System.out.println();
-        }
-
-    }
-
-
-    private static List<Map<String, String>> convertStringToList(String input) {
-        List<Map<String, String>> resultList = new ArrayList<>();
-
-        if (input!=null && !input.isEmpty()) {
-            String content = input.substring(1, input.length() - 1);
-
-            String[] mapRepresentations = content.split("\\},\\s*\\{");
-
-            for (String mapRepresentation : mapRepresentations) {
-                Map<String, String> map = new LinkedHashMap<>();
-                mapRepresentation = mapRepresentation.replaceFirst("\\{", "").replaceFirst("\\}", "");
-                String[] keyValues = mapRepresentation.split(",\\s*");
-
-                for (String keyValue : keyValues) {
-                    String[] parts = keyValue.split("=");
-
-                    if (parts.length == 2) {
-                        String key = parts[0].trim();
-                        String value = parts[1].trim();
-                        map.put(key, value);
-                    }
-                }
-                resultList.add(map);
+        if(!newList.isEmpty()) {
+            newList.sort(Comparator.comparing(Product::getProductID));
+            for (Product product : newList) {
+                System.out.println(product);
+                System.out.println();
             }
+        }else {
+            System.out.println("No products to display in "+productType);
         }
 
-        return resultList;
     }
+
+
+
 
 
 }

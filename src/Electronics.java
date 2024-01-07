@@ -35,9 +35,12 @@ public class Electronics extends Product{
 
     @Override
     public String toString() {
-        return "Electronics{" +
-                "brand='" + brand + '\'' +
-                ", warrantyPeriod='" + warrantyPeriod + '\'' +
-                '}';
+        return  "Product ID : " + getProductID() +"\n"+
+                "Product Type : " + "Electronics" + '\n' +
+                "Product Name : " + getName() + '\n' +
+                "Product Available : " + getProductAblNo() + '\n' +
+                "Product Price : " + getPrice() + '\n' +
+                "Product Brand : " + brand + '\n' +
+                "Product Warranty Period : " + warrantyPeriod +"" ;
     }
 }

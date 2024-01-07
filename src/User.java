@@ -1,12 +1,12 @@
 public class User {
-    private String userName;
+    private String userName = "Bethmi";
     private String password;
 
     public User() {
     }
 
     public User(String userName, String password) {
-        this.userName = "Bethmi";
+        this.userName = userName;
         this.password = password;
     }
 
