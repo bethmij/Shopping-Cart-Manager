@@ -5,16 +5,14 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.*;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 public class ShoppingCartGUIController extends JFrame {
     User user = new User();
     OrderDetails orderDetails = getOrderDetails();
+    ShoppingCart shoppingCart = new ShoppingCart();
     static String filePath = "order.txt";
 
     ShoppingCartGUIController(){
@@ -64,10 +62,11 @@ public class ShoppingCartGUIController extends JFrame {
         Border paddingBorder2 = new EmptyBorder(30, 10, 5, 100);
         panel2.setBorder(paddingBorder2);
 
-        double total = calculateTotal(shoppingCartList);
-        double discountThreeItem = calculateThreeItemDiscount(shoppingCartList, total);
-        double discountFirstPurchase = calculateFirstDiscount(shoppingCartList, total);
-        double finalTotal = total-(discountThreeItem+discountFirstPurchase);
+        List<Double> totalCalMarks = shoppingCart.calcTotalCost();
+        double total = totalCalMarks.get(0);
+        double discountFirstPurchase = totalCalMarks.get(1);
+        double discountThreeItem = totalCalMarks.get(2);
+        double finalTotal = totalCalMarks.get(3);
 
 
         JLabel lbl1 = new JLabel("<html><div style='text-align: right;'>Total  :  " +
@@ -104,17 +103,14 @@ public class ShoppingCartGUIController extends JFrame {
         panel3.add(btn2);
         Border paddingBorder1 = new EmptyBorder(10, 10, 10, 10);
         panel3.setBorder(paddingBorder1);
-        btn2.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
+        btn2.addActionListener(e -> {
 
-                OrderDetails orderDetails = new OrderDetails(user.getUserName(), shoppingCartList, finalTotal);
-                try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(filePath))) {
-                    oos.writeObject(orderDetails);
-                    System.out.println("Order Saved Successfully!");
-                } catch (IOException en) {
-                    System.out.println("Error writing to the file: " + en.getMessage());
-                }
+            OrderDetails orderDetails = new OrderDetails(user.getUserName(), shoppingCartList, finalTotal);
+            try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(filePath))) {
+                oos.writeObject(orderDetails);
+                System.out.println("Order Saved Successfully!");
+            } catch (IOException en) {
+                System.out.println("Error writing to the file: " + en.getMessage());
             }
         });
 
@@ -152,48 +148,6 @@ public class ShoppingCartGUIController extends JFrame {
         return newDateList;
     }
 
-    public int calculateTotal(List<Map<String, String>> shoppingCartList){
-        int total = 0;
-        for (Map<String, String> map : shoppingCartList) {
-            total+=Double.parseDouble(map.get("Product Price"));
-        }
-        return total;
-    }
-
-    public double calculateThreeItemDiscount(List<Map<String, String>> shoppingCartList, double total){
-        double discount = 0;
-        int electronicCount = 0;
-        int clothingCount = 0;
-
-        for (Map<String, String> map : shoppingCartList) {
-            if(map.get("Product Type").equals("Electronics")){
-                if(map.get("Product Quantity").compareTo("1")>0){
-                    electronicCount+=Integer.parseInt(map.get("Product Quantity"));
-                }else {
-                    electronicCount++;
-                }
-            }else if(map.get("Product Type").equals("Clothing")){
-                if(map.get("Product Quantity").compareTo("1")>0){
-                    clothingCount+=Integer.parseInt(map.get("Product Quantity"));
-                }else {
-                    clothingCount++;
-                }
-            }
-        }
-        if(electronicCount==3 || clothingCount==3){
-            discount = (20 / 100.0) * total;
-        }
-        return discount;
-    }
-
-    public double calculateFirstDiscount(List<Map<String, String>> shoppingCartList, double total){
-        double discount = 0;
-
-        if (orderDetails.getCustomerName()==null || !orderDetails.getCustomerName().equals(user.getUserName())) {
-            discount = (10 / 100.0) * total;
-        }
-        return discount;
-    }
 
     public static OrderDetails getOrderDetails() {
         OrderDetails orderDetails = new OrderDetails();
