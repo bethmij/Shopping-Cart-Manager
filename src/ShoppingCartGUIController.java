@@ -5,6 +5,8 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.*;
 import java.util.List;
 import java.util.Map;
@@ -49,14 +51,15 @@ public class ShoppingCartGUIController extends JFrame {
         }
 
         JScrollPane scrollPane = new JScrollPane(table);
+        scrollPane.setPreferredSize(new Dimension(900, 350));
         panel1.add(scrollPane);
         panel1.add(scrollPane, BorderLayout.CENTER);
         Border paddingBorder = new EmptyBorder(10, 40, 0, 40);
         panel1.setBorder(paddingBorder);
 
         JPanel panel2 = new JPanel();
-        panel2.setLayout(new BoxLayout(panel2, BoxLayout.Y_AXIS));
-        Border paddingBorder2 = new EmptyBorder(30, 10, 5, 100);
+        panel2.setLayout(new GridLayout(5, 1,0,10));
+        Border paddingBorder2 = new EmptyBorder(10, 0, 5, 90);
         panel2.setBorder(paddingBorder2);
 
         List<Double> totalCalMarks = shoppingCart.calcTotalCost();
@@ -66,29 +69,23 @@ public class ShoppingCartGUIController extends JFrame {
         double finalTotal = totalCalMarks.get(3);
 
 
-        JLabel lbl1 = new JLabel("<html><div style='text-align: right;'>Total  :  " +
-                                                ""+total+"</div></html>");
+        JLabel lbl1 = new JLabel("Total  :  "+total);
         lbl1.setFont(new Font("Arial",Font.PLAIN,18));
-        lbl1.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
+        lbl1.setHorizontalAlignment(JLabel.RIGHT);
         panel2.add(lbl1);
-        panel2.add(Box.createVerticalStrut(10));
 
-        JLabel lbl2 = new JLabel("<html><div style='text-align: right;'>First Purchase Discount (10%)  :  "+
-                                                ""+discountFirstPurchase+"  </div></html>");
+        JLabel lbl2 = new JLabel("First Purchase Discount (10%)  :  "+discountFirstPurchase);
         lbl2.setFont(new Font("Arial",Font.PLAIN,18));
-        lbl2.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
+        lbl2.setHorizontalAlignment(JLabel.RIGHT);
         panel2.add(lbl2);
-        panel2.add(Box.createVerticalStrut(10));
 
-        JLabel lbl3 = new JLabel("<html><div style='text-align: right;'>Three items in same Category Discount (20%) :  "+
-                                        discountThreeItem+"  </div></html>");
+        JLabel lbl3 = new JLabel("Three items in same Category Discount (20%) :  "+discountThreeItem);
         lbl3.setFont(new Font("Arial",Font.PLAIN,18));
         lbl3.setHorizontalAlignment(JLabel.RIGHT);
         panel2.add(lbl3);
         panel2.add(Box.createVerticalStrut(10));
 
-        JLabel lbl4 = new JLabel("<html><div style='text-align: right;'>Final Total  :  "+
-                                        finalTotal+"</div></html>");
+        JLabel lbl4 = new JLabel("Final Total  :  "+finalTotal);
         lbl4.setFont(new Font("Arial",Font.PLAIN,18));
         lbl4.setHorizontalAlignment(JLabel.RIGHT);
         panel2.add(lbl4);
@@ -100,14 +97,16 @@ public class ShoppingCartGUIController extends JFrame {
         panel3.add(btn2);
         Border paddingBorder1 = new EmptyBorder(10, 10, 10, 10);
         panel3.setBorder(paddingBorder1);
-        btn2.addActionListener(e -> {
-
-            OrderDetails orderDetails = new OrderDetails(user.getUserName(), shoppingCartList, finalTotal);
-            try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(filePath))) {
-                oos.writeObject(orderDetails);
-                System.out.println("Order Saved Successfully!");
-            } catch (IOException en) {
-                System.out.println("Error writing to the file: " + en.getMessage());
+        btn2.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                OrderDetails orderDetails = new OrderDetails(user.getUserName(), shoppingCartList, finalTotal);
+                try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(filePath))) {
+                    oos.writeObject(orderDetails);
+                    System.out.println("Order Saved Successfully!");
+                } catch (IOException en) {
+                    System.out.println("Error writing to the file: " + en.getMessage());
+                }
             }
         });
 

@@ -121,9 +121,9 @@ public class ShoppingCart extends DefaultTableCellRenderer {
 
         double finalTotal = total-(discountFirstPurchase+discountThreePurchase);
 
-        totalCal.add(total);
-        totalCal.add(discountFirstPurchase);
-        totalCal.add(discountThreePurchase);
+        totalCal.add(Math.round(total * 100.0) / 100.0);
+        totalCal.add(Math.round(discountFirstPurchase * 100.0) / 100.0);
+        totalCal.add(Math.round(discountThreePurchase * 100.0) / 100.0);
         totalCal.add(finalTotal);
 
         return totalCal;
