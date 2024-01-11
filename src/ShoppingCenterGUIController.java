@@ -1,9 +1,13 @@
 import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.List;
 import java.util.*;
 
@@ -20,7 +24,12 @@ public class ShoppingCenterGUIController extends JFrame {
     }
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> new ShoppingCenterGUIController().setVisible(true));
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                new ShoppingCenterGUIController().setVisible(true);
+            }
+        });
     }
 
     public void setGUI(List<Product> productList){
@@ -30,7 +39,7 @@ public class ShoppingCenterGUIController extends JFrame {
         setLocationRelativeTo(null);
 
         JPanel panel1 = new JPanel();
-        panel1.setLayout(new BoxLayout(panel1, BoxLayout.X_AXIS));
+        panel1.setLayout(new FlowLayout(FlowLayout.CENTER, 10, 0));
         panel1.add(Box.createVerticalStrut(100));
 
         JLabel lbl1 = new JLabel("Select Product Category");
@@ -46,20 +55,23 @@ public class ShoppingCenterGUIController extends JFrame {
         panel1.add(comboBox);
         panel1.add(Box.createHorizontalStrut(250));
 
-        comboBox.addActionListener(e -> {
-            String selectedOption = (String) comboBox.getSelectedItem();
-            switch (Objects.requireNonNull(selectedOption)){
-                case "All":
-                    updateTable (tableModel, productList);
-                    break;
-                case "Electronics":
-                    List<Product> electronicList = sortByCategory(productList, "Electronics");
-                    updateTable (tableModel, electronicList);
-                    break;
-                case "Clothing":
-                    List<Product> clothingList = sortByCategory(productList, "Clothing");
-                    updateTable (tableModel, clothingList);
-
+        comboBox.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String selectedOption = (String) comboBox.getSelectedItem();
+                switch (Objects.requireNonNull(selectedOption)) {
+                    case "All":
+                        updateTable(tableModel, productList);
+                        break;
+                    case "Electronics":
+                        List<Product> electronicList = sortByCategory(productList, "Electronics");
+                        updateTable(tableModel, electronicList);
+                        break;
+                    case "Clothing":
+                        List<Product> clothingList = sortByCategory(productList, "Clothing");
+                        updateTable(tableModel, clothingList);
+                        break;
+                }
             }
         });
 
@@ -69,12 +81,15 @@ public class ShoppingCenterGUIController extends JFrame {
         panel1.add(btn1);
         panel1.add(Box.createHorizontalStrut(10));
 
-        btn1.addActionListener(e -> new ShoppingCartGUIController().setVisible(true));
+        btn1.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                new ShoppingCartGUIController().setVisible(true);
+            }
+        });
 
-
-        int rows = (int) Math.ceil((double) productList.size() / 5);
-        JPanel panel2 = new JPanel(new GridLayout(Math.min(rows, 2), 5, 10, 10));
-        panel1.add(Box.createVerticalStrut(100));
+        JPanel panel2 = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        panel2.setPreferredSize(new Dimension(900, 100));
 
         String[] columnNames = {"Product ID", "Name", "Category", "Price ($)", "Info"};
         String[][] data = getCustomizedDataArray(productList);
@@ -92,41 +107,39 @@ public class ShoppingCenterGUIController extends JFrame {
         }
 
         JScrollPane scrollPane = new JScrollPane(table);
+        scrollPane.setPreferredSize(new Dimension(800, 300));
 
-        table.getSelectionModel().addListSelectionListener(e -> {
-            if (!e.getValueIsAdjusting()) {
-                tableRowNumber = table.getSelectedRow();
-                lbl9.setForeground(Color.BLACK);
-                if (tableRowNumber != -1) {
-                    String productID = (String) table.getValueAt(tableRowNumber, 0);
-                    setSelectedProductDetails(productID, productList);
+        table.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+            @Override
+            public void valueChanged(ListSelectionEvent e) {
+                if (!e.getValueIsAdjusting()) {
+                    tableRowNumber = table.getSelectedRow();
+                    lbl9.setForeground(Color.BLACK);
+                    if (tableRowNumber != -1) {
+                        String productID = (String) table.getValueAt(tableRowNumber, 0);
+                        setSelectedProductDetails(productID, productList);
+                    }
                 }
             }
         });
 
-        panel2.add(scrollPane, BorderLayout.CENTER);
-        Border paddingBorder = new EmptyBorder(10, 40, 0, 40);
+        panel2.add(scrollPane,BorderLayout.PAGE_START);
+        Border paddingBorder = new EmptyBorder(0, 40, 0, 40);
         panel2.setBorder(paddingBorder);
 
         JPanel panel3 = new JPanel();
-        panel3.setLayout(new BoxLayout(panel3, BoxLayout.Y_AXIS));
-        Border paddingBorder2 = new EmptyBorder(10, 40, 30, 10);
+        panel3.setLayout(new GridLayout(7, 1,0,10));
+        panel3.setPreferredSize(new Dimension(900, 250));
+        Border paddingBorder2 = new EmptyBorder(0, 40, 30, 10);
         panel3.setBorder(paddingBorder2);
 
 
         JLabel lbl2 = new JLabel("Selected Product - Details");
         lbl2.setFont(new Font("Arial",Font.PLAIN,20));
-        lbl2.setHorizontalAlignment(JLabel.CENTER);
         panel3.add(lbl2, BorderLayout.CENTER);
-
-
-        JLabel lbl3 = new JLabel(" ");
-        lbl3.setFont(new Font("Arial",Font.PLAIN,20));
-        panel3.add(lbl3);
 
         lbl4 = new JLabel("Product ID :");
         lbl4.setFont(new Font("Arial",Font.PLAIN,18));
-        lbl4.setHorizontalAlignment(JLabel.CENTER);
         panel3.add(lbl4);
 
         lbl5 = new JLabel("Category :");
@@ -155,7 +168,12 @@ public class ShoppingCenterGUIController extends JFrame {
         btn2.setHorizontalAlignment(JButton.CENTER);
         panel4.add(btn2);
 
-        btn2.addActionListener(e -> shoppingCart.addItems(lbl4.getText(), productList,lbl5,table, lbl9));
+        btn2.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                shoppingCart.addItems(lbl4.getText(), productList, lbl5, table, lbl9);
+            }
+        });
 
         JPanel panel5 = new JPanel();
         panel5.setLayout(new BoxLayout(panel5, BoxLayout.Y_AXIS));
