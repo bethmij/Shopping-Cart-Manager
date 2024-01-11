@@ -23,14 +23,6 @@ public class ShoppingCenterGUIController extends JFrame {
         setGUI(productList);
     }
 
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                new ShoppingCenterGUIController().setVisible(true);
-            }
-        });
-    }
 
     public void setGUI(List<Product> productList){
         setSize(900, 800);
@@ -171,7 +163,11 @@ public class ShoppingCenterGUIController extends JFrame {
         btn2.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                shoppingCart.addItems(lbl4.getText(), productList, lbl5, table, lbl9);
+                if (!lbl4.getText().equals("Product ID :")) {
+                    shoppingCart.addItems(lbl4.getText(), productList, lbl5, table, lbl9);
+                }else {
+                    System.out.println("Choose a item to proceed further!");
+                }
             }
         });
 

@@ -8,18 +8,18 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 public class ShoppingCartGUIController extends JFrame {
-    User user = new User();
     ShoppingCart shoppingCart = new ShoppingCart();
+    static List<OrderDetails> orderDetails = getOrderDetails();
     static String filePath = "order.txt";
 
     ShoppingCartGUIController(){
         List<Map<String, String>> shoppingCartList = ShoppingCenterGUIController.shoppingCartList;
         List<Product> productList = WestministerShoppingManager.getProductList();
-
         setShoppingCartGUI(shoppingCartList, productList);
 
     }
@@ -68,7 +68,6 @@ public class ShoppingCartGUIController extends JFrame {
         double discountThreeItem = totalCalMarks.get(2);
         double finalTotal = totalCalMarks.get(3);
 
-
         JLabel lbl1 = new JLabel("Total  :  "+total);
         lbl1.setFont(new Font("Arial",Font.PLAIN,18));
         lbl1.setHorizontalAlignment(JLabel.RIGHT);
@@ -100,7 +99,8 @@ public class ShoppingCartGUIController extends JFrame {
         btn2.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                OrderDetails orderDetails = new OrderDetails(user.getUserName(), shoppingCartList, finalTotal);
+                OrderDetails newOrderDetails = new OrderDetails(LoginGUIController.user.getUserName(), shoppingCartList, finalTotal);
+                orderDetails.add(newOrderDetails);
                 try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(filePath))) {
                     oos.writeObject(orderDetails);
                     System.out.println("Order Saved Successfully!");
@@ -145,15 +145,15 @@ public class ShoppingCartGUIController extends JFrame {
     }
 
 
-    public static OrderDetails getOrderDetails() {
-        OrderDetails orderDetails = new OrderDetails();
-        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(filePath))) {
-            orderDetails = (OrderDetails) ois.readObject();
+    public static List<OrderDetails> getOrderDetails() {
+        List<OrderDetails> orderDetailsList = new ArrayList<>();
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream("order.txt"))) {
+            orderDetailsList = (List<OrderDetails>) ois.readObject();
         } catch (EOFException ignored) {
         } catch (IOException | ClassNotFoundException e) {
             System.out.println("Error: " + e.getMessage());
         }
-        return orderDetails;
+        return orderDetailsList;
     }
 
 }

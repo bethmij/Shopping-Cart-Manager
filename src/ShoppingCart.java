@@ -66,7 +66,7 @@ public class ShoppingCart extends DefaultTableCellRenderer {
                             double currentPrice = Double.parseDouble(dataList.get("Product Price"));
                             double additionalPrice = product.getPrice();
                             double newPrice = currentPrice + additionalPrice;
-                            list.put("Product Price", String.valueOf(newPrice));
+                            list.put("Product Price", String.valueOf(Math.round(newPrice * 100.0) / 100.0));
                         }
                     }
                 }
@@ -81,9 +81,6 @@ public class ShoppingCart extends DefaultTableCellRenderer {
 
 
     public List<Double> calcTotalCost(){
-
-        OrderDetails orderDetails = ShoppingCartGUIController.getOrderDetails();
-        User user = new User();
         List<Double> totalCal = new ArrayList<>();
 
         double total = 0;
@@ -97,26 +94,35 @@ public class ShoppingCart extends DefaultTableCellRenderer {
 
         for (Map<String, String> map : ShoppingCenterGUIController.shoppingCartList) {
             if(map.get("Product Type").equals("Electronics")){
-                if(map.get("Product Quantity").compareTo("1")>0){
+                if(map.get("Product Quantity").compareTo("1") > 0){
                     electronicCount+=Integer.parseInt(map.get("Product Quantity"));
                 }else {
                     electronicCount++;
                 }
             }else if(map.get("Product Type").equals("Clothing")){
-                if(map.get("Product Quantity").compareTo("1")>0){
+                if(map.get("Product Quantity").compareTo("1") > 0){
                     clothingCount+=Integer.parseInt(map.get("Product Quantity"));
                 }else {
                     clothingCount++;
                 }
             }
         }
-        if(electronicCount==3 || clothingCount==3){
+        if(electronicCount>=3 || clothingCount>=3){
             discountThreePurchase = (20 / 100.0) * total;
         }
 
         double discountFirstPurchase = 0;
-        if (orderDetails.getCustomerName()==null || !orderDetails.getCustomerName().equals(user.getUserName())) {
-            discountFirstPurchase = (10 / 100.0) * total;
+        int count = 0;
+        if (ShoppingCartGUIController.orderDetails.isEmpty()){discountFirstPurchase = (10 / 100.0) * total;}
+        else {
+            for (OrderDetails orderList: ShoppingCartGUIController.orderDetails) {
+                if (orderList.getCustomerName() == null || !orderList.getCustomerName().equals(LoginGUIController.user.getUserName())) {
+                    count++;
+                }
+            }
+            if (count==ShoppingCartGUIController.orderDetails.size()){
+                discountFirstPurchase = (10 / 100.0) * total;
+            }
         }
 
         double finalTotal = total-(discountFirstPurchase+discountThreePurchase);
@@ -124,7 +130,7 @@ public class ShoppingCart extends DefaultTableCellRenderer {
         totalCal.add(Math.round(total * 100.0) / 100.0);
         totalCal.add(Math.round(discountFirstPurchase * 100.0) / 100.0);
         totalCal.add(Math.round(discountThreePurchase * 100.0) / 100.0);
-        totalCal.add(finalTotal);
+        totalCal.add(Math.round(finalTotal * 100.0) / 100.0);
 
         return totalCal;
 
